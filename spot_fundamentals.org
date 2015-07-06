@@ -1,0 +1,269 @@
+#+TITLE: Core Concepts in Data Technologies
+#+AUTHOR:    Matthew Henderson, PhD, FCACB
+#+EMAIL:     matthew@darwin.local
+#+DATE:      \today
+:PROPERTIES:
+#+DRAWERS: LOGBOOK CLOCK HIDDEN PROPERTIES
+#+DESCRIPTION:
+#+STARTUP: overview
+#+STARTUP: hidestars
+#+STARTUP: indent
+#+KEYWORDS:
+#+LANGUAGE:  en
+#+OPTIONS:   H:2 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:t ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:
+#+LINK_HOME:
+#+XSLT:
+#+STARTUP: beamer
+#+LaTeX_CLASS: beamer
+# #+LaTeX_CLASS_OPTIONS: [smaller]
+#+BEAMER_FRAME_LEVEL: 2
+#+latex_header: \mode<beamer>{\usetheme{Antibes}}
+#+latex_header: \hypersetup{colorlinks,linkcolor=,urlcolor=blue}
+#+LaTeX_header: \usepackage{textpos}
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_header: \usepackage[labelfont=bf,format=hang,margin=10pt,labelsep=period]{caption,subfig}
+#+LaTeX_HEADER: \usemintedstyle{tango}
+#+LaTex_HEADER: \usepackage[usenames,dvipsnames]{xcolor}
+#+LaTeX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usetikzlibrary{shapes,backgrounds}
+#+LaTeX_HEADER: \usepackage{tikz-uml}
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{lmodern}
+#+LaTeX_HEADER: \usepackage{verbatim}
+#+LaTeX_HEADER: # \input{./figures/titlepage}
+:END:
+
+#+BEGIN_LaTeX
+\logo{%
+\makebox[0.95\paperwidth-5pt]{%
+\includegraphics[width=1cm,keepaspectratio]{/Users/matthew/Documents/TOH/logos/eorla_logo.png}
+\hfill
+\includegraphics[width=1cm]{/Users/matthew/Documents/TOH/logos/UOlogoBW.eps}}}
+\beamertemplatenavigationsymbolsempty
+\setbeamertemplate{caption}[numbered]
+\setbeamerfont{caption}{size=\tiny}
+#+END_LaTeX
+# xelatex --shell-escape -interaction=nonstopmode MPAH_cscc_2014.tex
+
+* Laboratory Information
+** Information Systems Design
+*** Single Point of Truth
+**** The practice of structuring information models such that every data element is stored exactly once
+*** Have you looked at your shared network drive lately?
+** Laboratory Data Sources
+\centering
+\include{./figures/venn-diagram}
+** A Unique Combination of Features
+#+ATTR_LaTeX: width=\textwidth
+ [[file:./figures/Platypus-sketch.jpg]]
+ \tiny
+ \centering
+ A venomous, electrolocating, egg-laying, duck-billed, beaver-tailed, otter-footed mammal
+** Fundamental Tools for Data Management
+*** Plain text (2)
+*** Version control (4)
+*** Automated Back-up system (1)
+*** Relational Database (3)
+*** Automation (5)
+** Why these tools
+\centering
+\include{./figures/gnuplot-basics}
+*** Developed and used by programmers
+
+* Fundamental Tools for Data Management
+** Plain Text
+*** Simple data formats: .txt, .csv
+**** Read by computers and humans alike.
+**** Text editors i.e. [[https://notepad-plus-plus.org/][Notepad++]]
+*** Compatibility and Longevity
+**** Sophisticated tool chains have been created to manage plain text files
+**** 20 year old method validation data - no problem
+***** bit rot - .wpd, .doc, .docx, .docxm ([[https://en.wikipedia.org/wiki/List_of_file_formats#Document][list]])
+** Plain Text
+*** Source code
+*** Markup Languages
+**** HTML, XML
+*** Structured Text
+**** HL7, SNOMED CT,  LOINC
+** Version Control
+\include{./figures/vcd_feature_synch}
+*** Document control software
+*** Cloud storage services
+*** [[https://git-scm.com][Git]]
+** Automated Back-up
+*** text                                            :BMCOL:B_ignoreheading:
+:PROPERTIES:
+:BEAMER_col: .5
+:BEAMER_env: ignoreheading
+:END:
+*** Automate it!
+*** Test your system before you need it
+*** Encripted cloud storage
+**** [[https://spideroak.com/][SpiderOak]]
+*** image                                           :BMCOL:B_ignoreheading:
+:PROPERTIES:
+:BEAMER_col: .5
+:BEAMER_env: ignoreheading
+:END:
+\include{./figures/disc}
+** Relational Database
+*** A collection of data tables
+*** The tables are part of a *Data Model* called a *Schema*
+*** The data model defines:
+**** The type of data stored in each column
+**** The relationship between tables
+** Data Model Concepts
+*** Entities - samples, physicians, patients, results
+*** Attributes - names, values, units, reference intervals,
+*** Relationships
+**** Samples come from Patients
+**** Results come from Samples
+*** COMMENT Cardinality
+**** Patients can have multiple samples
+**** Samples can have multiple tests
+**** Each sample will have only one creatinine
+** Schema
+\centering
+\include{./figures/basic_uml}
+
+** Database Operations: Structured Query Language
+- Filter :: subsetting or removing observations based on some condition
+  - select, where
+- Transform :: adding or modifying variables.
+  - functions
+- Aggregate :: reducing multiple values into a single value
+  - count, mean, sum with group by
+- Sort :: changing the order of observations
+  - order by
+
+*** Sqlite is a local database application
+  - sqlitebrowser
+** Schema
+#+BEGIN_SRC sql
+  -- Make a table
+  CREATE TABLE "biochemistry" (
+  `test`       TEXT,
+  `result`        NUMERIC,
+  `order_date`    TEXT,
+  `patient`       TEXT,
+  `clinic`        TEXT,
+  `physician`     TEXT);
+#+END_SRC
+** A month of HbA1c results from the Endo clinic
+#+BEGIN_SRC sql
+SELECT result, order_date, patient, clinic, physician FROM biochemistry
+WHERE test = 'HbA1C' AND
+clinic = 'clinic_*B7' AND
+order_date BETWEEN '2014-03-01' AND '2014-05-01'
+ORDER BY order_date;
+#+END_SRC
+** Output from the database
+\scriptsize
+\centering
+#+BEGIN_EXAMPLE
+|--------+---------------------+------------------+------------+-------------|
+| result | order_date          | patient          | clinic     | physician   |
+|--------+---------------------+------------------+------------+-------------|
+|    5.3 | 2014-03-01 09:59:06 | patient_*4C96CD5 | clinic_*B7 | phys_*B13FF |
+|    6.0 | 2014-03-01 10:10:09 | patient_*842DEC3 | clinic_*B7 | phys_*B13FF |
+|    4.5 | 2014-03-01 10:32:04 | patient_*CD42144 | clinic_*B7 | phys_*B13FF |
+|    6.0 | 2014-03-01 11:25:08 | patient_*A85C417 | clinic_*B7 | phys_*8449D |
+|    5.5 | 2014-03-01 12:05:05 | patient_*2BC50ED | clinic_*B7 | phys_*B13FF |
+|    4.6 | 2014-03-01 14:44:05 | patient_*B3B5C6E | clinic_*B7 | phys_*B13FF |
+|    5.6 | 2014-03-01 14:45:02 | patient_*36E9661 | clinic_*B7 | phys_*B13FF |
+|    7.8 | 2014-03-01 14:48:04 | patient_*4FE70F0 | clinic_*B7 | phys_*8449D |
+|    8.8 | 2014-03-01 18:01:02 | patient_*4C303D5 | clinic_*B7 | phys_*A939A |
+|    5.1 | 2014-03-04 10:14:03 | patient_*C7A4177 | clinic_*B7 | phys_*B13FF |
+...
+#+END_EXAMPLE
+
+** - Top ten ordering physicians
+
+#+BEGIN_SRC sql
+SELECT count(test) AS count, physician FROM biochemistry
+WHERE test = 'HbA1C' AND order_date BETWEEN '2014-03-01' AND '2014-05-01'
+GROUP BY physician ORDER BY count DESC LIMIT 10;
+#+END_SRC
+
+** Output from the database
+\scriptsize
+\centering
+#+BEGIN_EXAMPLE
+|-------+-------------|
+| count | physician   |
+|-------+-------------|
+|   168 | phys_*B13FF |
+|   167 | phys_*C6301 |
+|   161 | phys_*33AC2 |
+|   161 | phys_*8449D |
+|   140 | phys_*12F17 |
+|   123 | phys_*B9396 |
+|   110 | phys_*CEC56 |
+|   108 | phys_*0698F |
+|   107 | phys_*E6DBB |
+|    96 | phys_*B0395 |
+|-------+-------------|
+
+#+END_EXAMPLE
+
+** Number of HbA1c Orders by Day of the Week
+#+begin_src sqlite
+  SELECT STRFTIME('%w',order_date) AS day ,
+  COUNT(STRFTIME('%w',order_date)) AS count FROM biochemistry
+  WHERE test = "HbA1C" GROUP BY day;
+#+end_src
+
+** Output from the database
+\scriptsize
+\centering
+#+BEGIN_EXAMPLE
+|-----+-------|
+| day | count |
+|-----+-------|
+|   0 |  1027 |
+|   1 |   883 |
+|   2 |  6358 |
+|   3 |  6881 |
+|   4 |  7333 |
+|   5 |  6578 |
+|   6 |  5940 |
+|-----+-------|
+
+#+END_EXAMPLE
+
+** Why Script your analysis
+- A record of your work
+- Incrementally refine your analysis
+  - Forced to think through every step of the analysis
+  - Avoid spending effort recreating analysis
+  - Reproducible results
+  - Focus on refining and adding to current analysis
+  - Plan, Do, Check, Act in minutes
+- Gradually gain insight into data
+** Basic scripting
+#+BEGIN_SRC mysql
+-- Select all HbA1c results in a date range
+SELECT result, order_date, patient, clinic, physician FROM biochemistry
+WHERE test = 'HbA1C' AND
+clinic = 'clinic_*B7' AND
+order_date BETWEEN '2014-03-01' AND '2014-05-01'
+ORDER BY order_date;
+
+-- Find the top ten ordering physician for a given test
+SELECT count(test) AS count, physician FROM biochemistry
+WHERE test = 'HbA1C' AND order_date BETWEEN '2014-03-01' AND '2014-05-01'
+GROUP BY physician ORDER BY count DESC LIMIT 10;
+
+-- Weekly ordering practices
+SELECT STRFTIME('%w',order_date) AS day ,
+COUNT(STRFTIME('%w',order_date)) AS count FROM biochemistry
+WHERE test = "HbA1C" GROUP BY day;
+#+END_SRC
+** References
+Introduction to Data Technologies
+https://www.stat.auckland.ac.nz/~paul/ItDT/
