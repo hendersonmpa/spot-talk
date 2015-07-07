@@ -22,6 +22,7 @@
 #+LaTeX_CLASS: beamer
 # #+LaTeX_CLASS_OPTIONS: [smaller]
 #+BEAMER_FRAME_LEVEL: 2
+#+COLUMNS: %40ITEM %10BEAMER_env(Env) %9BEAMER_envargs(Env Args) %4BEAMER_col(Col) %10BEAMER_extra(Extra)
 #+latex_header: \mode<beamer>{\usetheme{Antibes}}
 #+latex_header: \hypersetup{colorlinks,linkcolor=,urlcolor=blue}
 #+LaTeX_header: \usepackage{textpos}
@@ -36,6 +37,9 @@
 #+LaTeX_HEADER: \usepackage{lmodern}
 #+LaTeX_HEADER: \usepackage{verbatim}
 #+LaTeX_HEADER: # \input{./figures/titlepage}
+#+LaTeX_header: \usepackage{handoutWithNotes}
+#+LaTeX_header: \pgfpagesuselayout{3 on 1 with notes}[a4paper,border shrink=5mm]
+
 :END:
 
 #+BEGIN_LaTeX
@@ -50,7 +54,7 @@
 #+END_LaTeX
 # xelatex --shell-escape -interaction=nonstopmode MPAH_cscc_2014.tex
 
-* Laboratory Information
+* Introduction
 ** Information Systems Design
 *** Single Point of Truth
 **** The practice of structuring information models such that every data element is stored exactly once
@@ -64,26 +68,50 @@
  \tiny
  \centering
  A venomous, electrolocating, egg-laying, duck-billed, beaver-tailed, otter-footed mammal
+** Why talk about tools
+*** Knuth                                                         :B_quote:
+:PROPERTIES:
+:BEAMER_env: quote
+:END:
+  The enjoyment of one's tools is an essential ingredient of
+  successful work.
+\newline
+
+\scriptsize
+#+LaTeX: \raggedleft{Donald Knuth, Computer Scientist, Turing Award Winner}
+
 ** Fundamental Tools for Data Management
 *** Plain text (2)
 *** Version control (4)
 *** Automated Back-up system (1)
 *** Relational Database (3)
 *** Automation (5)
-** Why these tools
+** Why this tool chain
+*** Open source
+**** Free
+**** Expandable
+**** Community support
+*** Reward
+**** Building
+**** Skill-set
+*** Integration
+*** Automation
+
+** Why this tool chain
 \centering
 \include{./figures/gnuplot-basics}
-*** Developed and used by programmers
 
 * Fundamental Tools for Data Management
 ** Plain Text
 *** Simple data formats: .txt, .csv
 **** Read by computers and humans alike.
-**** Text editors i.e. [[https://notepad-plus-plus.org/][Notepad++]]
+**** Text editors i.e. Notepad++
+***** https://notepad-plus-plus.org/
 *** Compatibility and Longevity
 **** Sophisticated tool chains have been created to manage plain text files
 **** 20 year old method validation data - no problem
-***** bit rot - .wpd, .doc, .docx, .docxm ([[https://en.wikipedia.org/wiki/List_of_file_formats#Document][list]])
+***** bit rot - .wpd, .doc, .docx, .docxm
+****** https://en.wikipedia.org/wiki/List_of_file_formats
 ** Plain Text
 *** Source code
 *** Markup Languages
@@ -94,7 +122,8 @@
 \include{./figures/vcd_feature_synch}
 *** Document control software
 *** Cloud storage services
-*** [[https://git-scm.com][Git]]
+*** Git:  [[https://git-scm.com]]
+**** Github: https://github.com/hendersonmpa/spot-talk
 ** Automated Back-up
 *** text                                            :BMCOL:B_ignoreheading:
 :PROPERTIES:
@@ -104,7 +133,8 @@
 *** Automate it!
 *** Test your system before you need it
 *** Encripted cloud storage
-**** [[https://spideroak.com/][SpiderOak]]
+**** SpiderOak
+***** https://spideroak.com/
 *** image                                           :BMCOL:B_ignoreheading:
 :PROPERTIES:
 :BEAMER_col: .5
@@ -117,6 +147,18 @@
 *** The data model defines:
 **** The type of data stored in each column
 **** The relationship between tables
+** Sqlite
+*** Quote                                                         :B_quote:
+:PROPERTIES:
+:BEAMER_env: quote
+:END:
+SQLite is a software library that implements a self-contained,
+serverless, zero-configuration, transactional SQL database
+engine. SQLite is the most widely deployed database engine in the
+world.
+*** Sqlite: https://www.sqlite.org/
+*** Windows installation: https://www.youtube.com/watch?v=VZ20Lh4zbRo
+*** DB Browser for SQLite: http://sqlitebrowser.org/
 ** Data Model Concepts
 *** Entities - samples, physicians, patients, results
 *** Attributes - names, values, units, reference intervals,
@@ -127,10 +169,6 @@
 **** Patients can have multiple samples
 **** Samples can have multiple tests
 **** Each sample will have only one creatinine
-** Schema
-\centering
-\include{./figures/basic_uml}
-
 ** Database Operations: Structured Query Language
 - Filter :: subsetting or removing observations based on some condition
   - select, where
@@ -141,9 +179,11 @@
 - Sort :: changing the order of observations
   - order by
 
-*** Sqlite is a local database application
-  - sqlitebrowser
 ** Schema
+\centering
+\include{./figures/basic_uml}
+
+** A Schema for a Single Table
 #+BEGIN_SRC sql
   -- Make a table
   CREATE TABLE "biochemistry" (
@@ -154,13 +194,15 @@
   `clinic`        TEXT,
   `physician`     TEXT);
 #+END_SRC
+
 ** A month of HbA1c results from the Endo clinic
 #+BEGIN_SRC sql
-SELECT result, order_date, patient, clinic, physician FROM biochemistry
-WHERE test = 'HbA1C' AND
-clinic = 'clinic_*B7' AND
-order_date BETWEEN '2014-03-01' AND '2014-05-01'
-ORDER BY order_date;
+  SELECT result, order_date, patient, clinic, physician
+  FROM biochemistry
+  WHERE test = 'HbA1C' AND
+  clinic = 'clinic_*B7' AND
+  order_date BETWEEN '2014-03-01' AND '2014-05-01'
+  ORDER BY order_date;
 #+END_SRC
 ** Output from the database
 \scriptsize
@@ -182,12 +224,15 @@ ORDER BY order_date;
 ...
 #+END_EXAMPLE
 
-** - Top ten ordering physicians
+** Top ten ordering physicians
 
 #+BEGIN_SRC sql
 SELECT count(test) AS count, physician FROM biochemistry
-WHERE test = 'HbA1C' AND order_date BETWEEN '2014-03-01' AND '2014-05-01'
-GROUP BY physician ORDER BY count DESC LIMIT 10;
+WHERE test = 'HbA1C' AND
+order_date BETWEEN '2014-03-01' AND '2014-05-01'
+GROUP BY physician
+ORDER BY count DESC
+LIMIT 10;
 #+END_SRC
 
 ** Output from the database
@@ -212,10 +257,12 @@ GROUP BY physician ORDER BY count DESC LIMIT 10;
 #+END_EXAMPLE
 
 ** Number of HbA1c Orders by Day of the Week
-#+begin_src sqlite
+#+begin_src sql
   SELECT STRFTIME('%w',order_date) AS day ,
-  COUNT(STRFTIME('%w',order_date)) AS count FROM biochemistry
-  WHERE test = "HbA1C" GROUP BY day;
+  COUNT(STRFTIME('%w',order_date)) AS count
+  FROM biochemistry
+  WHERE test = "HbA1C"
+  GROUP BY day;
 #+end_src
 
 ** Output from the database
@@ -233,22 +280,44 @@ GROUP BY physician ORDER BY count DESC LIMIT 10;
 |   5 |  6578 |
 |   6 |  5940 |
 |-----+-------|
-
 #+END_EXAMPLE
+*** 0 = Sunday
 
-** Why Script your analysis
+** Database vs Spreadsheet
+*** Pros                                                    :BMCOL:B_block:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_env: block
+:END:
+**** Data integrity
+***** types
+***** table level write access
+**** Automation
+***** Pipeline
+**** Scale
+**** Relational model
+*** Cons                                                    :BMCOL:B_block:
+:PROPERTIES:
+:BEAMER_col: 0.5
+:BEAMER_env: block
+:END:
+**** Set-up
+**** Initial Investment
+
+** Why Script?
 - A record of your work
-- Incrementally refine your analysis
-  - Forced to think through every step of the analysis
-  - Avoid spending effort recreating analysis
+- Incremental refinement
+  - Forced to think through every step
+  - Avoid spending effort recreating
   - Reproducible results
-  - Focus on refining and adding to current analysis
+  - Focus on refining and building
   - Plan, Do, Check, Act in minutes
-- Gradually gain insight into data
-** Basic scripting
+- Gradually gain insight into data and processes
+** First steps to automation
 #+BEGIN_SRC mysql
 -- Select all HbA1c results in a date range
-SELECT result, order_date, patient, clinic, physician FROM biochemistry
+SELECT result, order_date, patient, clinic, physician
+FROM biochemistry
 WHERE test = 'HbA1C' AND
 clinic = 'clinic_*B7' AND
 order_date BETWEEN '2014-03-01' AND '2014-05-01'
@@ -256,7 +325,8 @@ ORDER BY order_date;
 
 -- Find the top ten ordering physician for a given test
 SELECT count(test) AS count, physician FROM biochemistry
-WHERE test = 'HbA1C' AND order_date BETWEEN '2014-03-01' AND '2014-05-01'
+WHERE test = 'HbA1C' AND
+order_date BETWEEN '2014-03-01' AND '2014-05-01'
 GROUP BY physician ORDER BY count DESC LIMIT 10;
 
 -- Weekly ordering practices
