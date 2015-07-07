@@ -1,10 +1,10 @@
 # spot-talk
 
-#===============================================================
+
 # Single Point of Truth
-# MPA. Henderson and C. McCudden 2015-07-07
-# American Association for Clinical Chemistry 2015 Annual Meeting Supplementary Material
-#===============================================================
+## MPA. Henderson and C. McCudden 2015-07-07
+## American Association for Clinical Chemistry 2015 Annual Meeting Supplementary Material
+
 
 Data and scripts are provided (as is) as a supplement to the Short Course: Single Point of Truth.
 
